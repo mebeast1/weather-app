@@ -5,23 +5,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = document.querySelector(".search button");
   const weatherIcon = document.querySelector(".weather-icon");
 
+  const displayError = (message) => {
+    document.querySelector(".error").textContent = message;
+    document.querySelector(".error").style.display = "block";
+    document.querySelector(".weather").style.display = "none";
+  };
+
   const checkWeather = async (city) => {
+    city = city.trim()
+
+    if(!city){
+        displayError("Please enter a City Name !!")
+        return;
+    }
+  
     const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
 
-    
-
     if (response.status == 404) {
-      document.querySelector(".error").style.display = "block";
-      document.querySelector(".weather").style.display = "none";
+        displayError("City not Found")
     } else {
       var data = await response.json();
      
       document.querySelector(".city").innerHTML = data.name;
-      document.querySelector(".temp").innerHTML =
-        Math.round(data.main.temp) + "°C";
+      document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
       document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
-      document.querySelector(".wind").innerHTML =
-        Math.round(data.wind.speed) + "km/h";
+      document.querySelector(".wind").innerHTML = Math.round(data.wind.speed) + "km/h";
 
       if (data.weather[0].main == "Clear") {
         weatherIcon.src = "images/clear.png";
@@ -52,4 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
   searchBtn.addEventListener("click", () => {
     checkWeather(searchBox.value);
   });
+
+  searchBox.addEventListener("input",()=>{
+    document.querySelector(".error").style.display="none"
+  })
 });
